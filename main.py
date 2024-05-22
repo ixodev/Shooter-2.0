@@ -1,6 +1,7 @@
-# Written by Younès B. and Curtis Newton in Python with Pygame.
+# Written by Younès B.
 # Images : https://www.flaticon.com
 # Inspired from Graven
+import random
 
 try:
     import pygame
@@ -36,7 +37,8 @@ class Game:
         self.projectiles = []
 
         self.enemies = []
-        for enemy in range(3): self.enemies.append(Enemy())
+        for enemy in range(3):
+            self.enemies.append(Enemy())
         
 
         self.screen = pygame.display.set_mode(self.SCREENRECT.size)
@@ -44,6 +46,22 @@ class Game:
         pygame.display.set_icon(pygame.image.load("assets/banner.png"))
 
         self.bg = pygame.image.load("assets/bg.jpg")
+
+        self.comet_rain = False
+        self.comets = []
+        self.credits_font = pygame.font.Font("assets/Font.ttf", 20)
+
+    def spawn_comets(self):
+
+
+        for x in range(10):
+            comet = Comet()
+            comet.rect.x = random.randint(0, self.SCREENRECT.width - comet.rect.width)
+            comet.rect.y = random.randint(round(self.SCREENRECT.height / 2 * -1), comet.rect.height * -1)
+            self.comets.append(comet)
+
+        self.comet_rain = True
+
 
     def play_game_music(self):
         music = pygame.mixer.music.load("assets/sounds/music.ogg")
@@ -68,9 +86,8 @@ class Game:
 
     def draw_texts(self):
         color = pygame.Color("black")
-        credits_font = pygame.font.Font("assets/Font.ttf", 20)
         score_lives_font = pygame.font.Font("assets/Font.ttf", 35)
-        credits = credits_font.render("Written by Curtis Newton and Younès B. | Images : flaticon.com", 0, color)
+        credits = self.credits_font.render("Written by Younes B.", 0, color)
         score = score_lives_font.render("Score : " + str(self.player.score) + " points", 0, color)
         lives = score_lives_font.render("Lives : " + str(self.player.lives), 0, color)
         self.screen.blit(credits, (5, 5))
@@ -106,7 +123,7 @@ class Game:
         rect = banner.get_rect()
         self.screen.blit(banner, (self.SCREENRECT.width / 2 - rect.width / 2, self.SCREENRECT.height / 2 - rect.height / 2))
         font = pygame.font.Font("assets/Font.ttf", 30)
-        text = font.render("Shooter 2.0 by Curtis Newton and Younès B.", 0, [255, 255, 255])
+        text = font.render("Shooter 2.0 by Younes B.", 0, [255, 255, 255])
         rect = text.get_rect()
         self.screen.blit(text, (self.SCREENRECT.width / 2 - rect.width / 2, 10))
         button = pygame.image.load("assets/button.png")
@@ -121,14 +138,15 @@ class Game:
                 pygame.quit()
                 quit()
             elif evt.type == MOUSEBUTTONDOWN:
-                if rect.collidepoint(evt.pos): self.GAME_STATE = True
+                if rect.collidepoint(evt.pos):
+                    self.GAME_STATE = True
 
 
     def run(self):
 
         clock = pygame.time.Clock()
         running = True
-        self.play_game_music()
+        #self.play_game_music()
 
         while running:
             if not self.GAME_STATE: self.draw_menu()
@@ -144,7 +162,8 @@ class Game:
 
                     if self.player.attack:
                         self.player.update()
-                        if self.player.i == 24: self.player.attack = False
+                        if self.player.i == 24:
+                            self.player.attack = False
 
                     for projectile in self.projectiles:
                         self.screen.blit(projectile.image, projectile.rect)
@@ -167,6 +186,22 @@ class Game:
                         if enemy.lives <= 0:
                             enemy.respawn()
                             self.player.score += 1
+
+                    if random.randint(0, 100) == 24 and not self.comet_rain:
+                        self.comet_rain = True
+                        self.spawn_comets()
+
+                    for comet in self.comets:
+                        comet.update()
+                        if comet.finish:
+                            self.comets.remove(comet)
+                        else:
+                            self.screen.blit(comet.image, comet.rect)
+
+                    print(len(self.comets))
+
+                    if len(self.comets) == 0:
+                        self.comet_rain = False
 
                     if self.player.lives <= 0:
                         pygame.time.wait(2000)
