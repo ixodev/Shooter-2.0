@@ -1,6 +1,5 @@
 # Written by Younès B.
 # Images : https://www.flaticon.com
-# Inspired from Graven
 import random
 
 try:
@@ -19,6 +18,7 @@ except ImportError:
 pygame.init()
 pygame.display.init()
 pygame.mixer.init()
+pygame.font.init()
 
 
 class Game:
@@ -60,7 +60,7 @@ class Game:
             comet.rect.y = random.randint(round(self.SCREENRECT.height / 2 * -1), comet.rect.height * -1)
             self.comets.append(comet)
 
-        self.comet_rain = True
+
 
 
     def play_game_music(self):
@@ -187,21 +187,6 @@ class Game:
                             enemy.respawn()
                             self.player.score += 1
 
-                    if random.randint(0, 100) == 24 and not self.comet_rain:
-                        self.comet_rain = True
-                        self.spawn_comets()
-
-                    for comet in self.comets:
-                        comet.update()
-                        if comet.finish:
-                            self.comets.remove(comet)
-                        else:
-                            self.screen.blit(comet.image, comet.rect)
-
-                    print(len(self.comets))
-
-                    if len(self.comets) == 0:
-                        self.comet_rain = False
 
                     if self.player.lives <= 0:
                         pygame.time.wait(2000)
