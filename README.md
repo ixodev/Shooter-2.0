@@ -1,6 +1,5 @@
 # Shooter-2.0 By Younes B.
 
-<img src="assets/banner.png"/>
 
 <img src="thumbnail.png"/>
 
